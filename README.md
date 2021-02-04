@@ -18,7 +18,7 @@ This is a django application that allows users to order online.
 - <code>python3.6 virtual environment pip</code>
 
 ## Clone the Repo and rename it to suit your needs.
-- https://github.com/praize-laurine/Farm
+- https://github.com/praize-laurine/Goshen-foods
 
 ## Initialize git and add the remote repository
 - git init
