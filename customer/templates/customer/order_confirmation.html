@@ -88,7 +88,7 @@ const csrftoken = getCookie('csrftoken');
         // Show a confirmation message to the buyer
         $.ajax({
             type: 'POST',
-            url: "{% url 'order-confirmation' pk %}",
+            url: "{% url 'OrderConfirmation' pk %}",
             beforeSend: function(request) {
                 request.setRequestHeader('X-CSRFToken', csrftoken)
             },

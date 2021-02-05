@@ -3,8 +3,15 @@ from django.shortcuts import render, redirect
 from django.views import View
 from django.core.mail import send_mail
 from .models import MenuItem, Category, OrderModel
+from django.contrib.auth.decorators import login_required
+from django.db.models import Q
+from django.core.mail import send_mail
+from .forms import *
 
 
+
+
+# @login_required(login_url='/accounts/login/')
 class Index(View):
     def get(self, request, *args, **kwargs):
         return render(request, 'customer/index.html')
@@ -13,7 +20,6 @@ class Index(View):
 class About(View):
     def get(self, request, *args, **kwargs):
         return render(request, 'customer/about.html')
-
 
 class Order(View):
     def get(self, request, *args, **kwargs):
@@ -95,7 +101,7 @@ class Order(View):
             'price': price
         }
 
-        return redirect('order-confirmation', pk=order.pk)
+        return redirect('order_confirmation', pk=order.pk)
 
 
 class OrderConfirmation(View):
@@ -108,7 +114,7 @@ class OrderConfirmation(View):
             'price': order.price,
         }
 
-        return render(request, 'customer/order_confirmation.html', context)
+        return render(request, 'customer/order-confirmation.html', context)
 
     def post(self, request, pk, *args, **kwargs):
         data = json.loads(request.body)
@@ -124,3 +130,44 @@ class OrderConfirmation(View):
 class OrderPayConfirmation(View):
     def get(self, request, *args, **kwargs):
         return render(request, 'customer/order_pay_confirmation.html')
+
+class Menu(View):
+    def get(self, request, *args, **kwargs):
+        menu_items = MenuItem.objects.all()
+
+        context = {
+            'menu_items': menu_items
+        }
+
+        return render(request, 'customer/menu.html', context)
+
+
+class MenuSearch(View):
+    def get(self, request, *args, **kwargs):
+        query = self.request.GET.get("q")
+
+        menu_items = MenuItem.objects.filter(
+            Q(name__icontains=query) |
+            Q(price__icontains=query) |
+            Q(description__icontains=query)
+        )
+
+        context = {
+            'menu_items': menu_items
+        }
+
+        return render(request, 'customer/menu.html', context)    
+
+def registration(request):
+    if request.method == 'POST':
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            form.save()
+            return redirect('login')
+    else:
+        form = RegisterForm()
+    context = {
+        'form':form,
+    }
+    return render(request, 'registration/register.html', context)            
